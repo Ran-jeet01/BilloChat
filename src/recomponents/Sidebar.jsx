@@ -1,8 +1,9 @@
 import { useChat } from "./ChatContext";
-import { Search, Edit, Filter, Settings } from "lucide-react";
+import { Search, Edit, Settings } from "lucide-react";
 
 const Sidebar = () => {
   const {
+    showNewChat,
     isMobile,
     showChat,
     chats,
@@ -14,6 +15,11 @@ const Sidebar = () => {
     handleNewChatToggle,
     handleProfileToggle,
   } = useChat();
+
+  // Safe filtered chats
+  const filteredChats = chats?.filter((chat) =>
+    chat?.name?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div
@@ -54,7 +60,6 @@ const Sidebar = () => {
               className="w-4 h-4 text-gray-600 cursor-pointer hover:text-gray-800"
               onClick={handleNewChatToggle}
             />
-            <Filter className="w-4 h-4 text-gray-600 cursor-pointer hover:text-gray-800" />
           </div>
         </div>
 
@@ -73,38 +78,53 @@ const Sidebar = () => {
 
       {/* Chat List */}
       <div className="flex-1 overflow-y-auto">
-        {chats.map((chat) => (
-          <div
-            key={chat.id}
-            onClick={() => onChatSelect(chat)}
-            className={`p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 ${
-              chat.active ? "bg-purple-100 border-l-4 border-l-purple-500" : ""
-            }`}
-          >
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
-                <span className="text-gray-600 font-medium text-sm">
-                  {chat.name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")
-                    .toUpperCase()}
-                </span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-medium text-gray-900 truncate">
-                    {chat.name}
-                  </h3>
-                  <span className="text-xs text-gray-500 whitespace-nowrap">
-                    {chat.time}
+        {filteredChats?.length === 0 ? (
+          <div className="p-4 text-center text-gray-500">No chats found</div>
+        ) : (
+          filteredChats?.map((chat) => (
+            <div
+              key={chat.id}
+              onClick={() => handleChatSelect(chat)}
+              className={`p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 ${
+                chat.active
+                  ? "bg-purple-100 border-l-4 border-l-purple-500"
+                  : ""
+              }`}
+            >
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
+                  <span className="text-gray-600 font-medium text-sm">
+                    {chat.name
+                      ?.split(" ")
+                      .map((n) => n[0])
+                      .join("")
+                      .toUpperCase()}
                   </span>
                 </div>
-                <p className="text-sm text-gray-600 truncate">{chat.message}</p>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-medium text-gray-900 truncate">
+                      {chat.name}
+                    </h3>
+                    <span className="text-xs text-gray-500 whitespace-nowrap">
+                      {chat.time}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm text-gray-600 truncate">
+                      {chat.message}
+                    </p>
+                    {chat.type === "group" && (
+                      <span className="text-xs text-purple-600 bg-purple-100 px-2 py-1 rounded-full">
+                        Group
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );

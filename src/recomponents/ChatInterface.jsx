@@ -14,11 +14,9 @@ const ChatInterface = () => {
         <Map />
       ) : (
         <>
-          <div className="relative">
-            <Sidebar />
-            <NewChatSidebar />
-            <UserProfileModal />
-          </div>
+          <Sidebar />
+          <NewChatSidebar />
+          <UserProfileModal />
           <MainChatBox />
         </>
       )}

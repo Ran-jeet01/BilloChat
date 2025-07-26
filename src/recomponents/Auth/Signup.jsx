@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import billo from "../assets/billo.png";
-import yomari from "../assets/yomari.png";
-import sujal2 from "../assets/sujal2.png";
-import sameer from "../assets/sameer.png";
-import bistey from "../assets/bistey.png";
-import srijan from "../assets/srijan.png";
+import { useAuth } from "../AuthProvider";
+import { useNavigate, Link } from "react-router-dom";
+import billo from "../../assets/billo.png";
+// import sujal2 from "../../assets/sujal2.png";
+// import sameer from "../../assets/sameer.png";
+// import bistey from "../../assets/bistey.png";
+// import srijan from "../../assets/srijan.png";
 
 export default function BilloChatSignup() {
   const [firstName, setFirstName] = useState("");
@@ -15,9 +16,60 @@ export default function BilloChatSignup() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [agreeToTerms, setAgreeToTerms] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // Placeholder images - in your actual implementation, import these from your assets
+  const { signup, googleLogin, facebookLogin, currentUser } = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect if already logged in
+  React.useEffect(() => {
+    if (currentUser) {
+      navigate("/chat");
+    }
+  }, [currentUser, navigate]);
+
+  const handleSignup = async (e) => {
+    e.preventDefault();
+
+    if (password !== confirmPassword) {
+      setError("Passwords don't match");
+      return;
+    }
+
+    setError("");
+    setLoading(true);
+
+    try {
+      await signup(email, password, firstName, lastName);
+      navigate("/chat");
+    } catch (error) {
+      setError(error.message);
+      console.error("Signup error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      await googleLogin();
+      navigate("/chat");
+    } catch (error) {
+      setError(error.message);
+      console.error("Google login error:", error);
+    }
+  };
+
+  const handleFacebookLogin = async () => {
+    try {
+      await facebookLogin();
+      navigate("/chat");
+    } catch (error) {
+      setError(error.message);
+      console.error("Facebook login error:", error);
+    }
+  };
 
   return (
     <div
@@ -33,9 +85,7 @@ export default function BilloChatSignup() {
       <div className="hidden md:block absolute bottom-20 left-20 w-40 h-40 bg-purple-400/20 rounded-full blur-2xl"></div>
 
       {/* Floating elements - hidden on mobile */}
-      <div className="hidden md:block absolute bottom-20 left-20 w-30 h-24">
-        <img src={yomari} alt="" className="w-full h-full object-contain"></img>
-      </div>
+      {/* \
       <div className="hidden md:block absolute top-20 left-20 w-30 h-24">
         <img src={bistey} alt="" className="w-full h-full object-contain"></img>
       </div>
@@ -47,7 +97,7 @@ export default function BilloChatSignup() {
       </div>
       <div className="hidden md:block absolute bottom-16 right-20">
         <img src={sujal2} className="h-30 w-30 object-contain"></img>
-      </div>
+      </div> */}
 
       {/* Main signup container */}
       <div className="flex items-center justify-center min-h-[100vh] p-4">
@@ -60,6 +110,7 @@ export default function BilloChatSignup() {
               className="w-20 h-16 md:w-24 md:h-20 rounded-2xl"
             ></img>
           </div>
+
           {/* Welcome text */}
           <div className="text-center mb-6 md:mb-8">
             <h1 className="text-white text-2xl md:text-3xl font-semibold mb-2">
@@ -70,8 +121,15 @@ export default function BilloChatSignup() {
             </p>
           </div>
 
+          {/* Error message */}
+          {error && (
+            <div className="mb-4 p-3 bg-red-500/20 text-red-100 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
+
           {/* Form */}
-          <div className="space-y-3 md:space-y-4">
+          <form onSubmit={handleSignup} className="space-y-3 md:space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <input
                 type="text"
@@ -79,6 +137,7 @@ export default function BilloChatSignup() {
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 className="w-full px-4 py-2 md:py-3 bg-white/90 rounded-lg placeholder-gray-500 text-gray-800 focus:outline-none focus:ring-2 focus:ring-white/50 text-sm md:text-base"
+                required
               />
               <input
                 type="text"
@@ -86,6 +145,7 @@ export default function BilloChatSignup() {
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
                 className="w-full px-4 py-2 md:py-3 bg-white/90 rounded-lg placeholder-gray-500 text-gray-800 focus:outline-none focus:ring-2 focus:ring-white/50 text-sm md:text-base"
+                required
               />
             </div>
 
@@ -96,6 +156,7 @@ export default function BilloChatSignup() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-2 md:py-3 bg-white/90 rounded-lg placeholder-gray-500 text-gray-800 focus:outline-none focus:ring-2 focus:ring-white/50 text-sm md:text-base"
+                required
               />
             </div>
 
@@ -106,6 +167,8 @@ export default function BilloChatSignup() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-2 md:py-3 bg-white/90 rounded-lg placeholder-gray-500 text-gray-800 focus:outline-none focus:ring-2 focus:ring-white/50 pr-12 text-sm md:text-base"
+                required
+                minLength="6"
               />
               <button
                 type="button"
@@ -123,6 +186,8 @@ export default function BilloChatSignup() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 className="w-full px-4 py-2 md:py-3 bg-white/90 rounded-lg placeholder-gray-500 text-gray-800 focus:outline-none focus:ring-2 focus:ring-white/50 pr-12 text-sm md:text-base"
+                required
+                minLength="6"
               />
               <button
                 type="button"
@@ -133,49 +198,31 @@ export default function BilloChatSignup() {
               </button>
             </div>
 
-            <div className="flex items-start space-x-2">
-              {/* <input
-                type="checkbox"
-                id="terms"
-                checked={agreeToTerms}
-                onChange={(e) => setAgreeToTerms(e.target.checked)}
-                className="mt-1 w-4 h-4 text-blue-600 bg-white/90 border-gray-300 rounded focus:ring-blue-500"
-              /> */}
-              {/* <label
-                htmlFor="terms"
-                className="text-white/70 text-xs md:text-sm"
-              >
-                I agree to the{" "}
-                <a href="#" className="text-white hover:underline">
-                  Terms of Service
-                </a>{" "}
-                and{" "}
-                <a href="#" className="text-white hover:underline">
-                  Privacy Policy
-                </a>
-              </label> */}
-            </div>
-
             <button
-              onClick={() => console.log("Sign up clicked")}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 md:py-3 rounded-lg font-medium transition-colors flex items-center justify-center text-sm md:text-base"
+              type="submit"
+              disabled={loading}
+              className={`w-full bg-blue-600 hover:bg-blue-700 text-white py-2 md:py-3 rounded-lg font-medium transition-colors flex items-center justify-center text-sm md:text-base ${
+                loading ? "opacity-70 cursor-not-allowed" : ""
+              }`}
             >
-              Create Account
-              <svg
-                className="ml-2 w-3 h-3 md:w-4 md:h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
+              {loading ? "Creating account..." : "Create Account"}
+              {!loading && (
+                <svg
+                  className="ml-2 w-3 h-3 md:w-4 md:h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              )}
             </button>
-          </div>
+          </form>
 
           {/* Divider */}
           <div className="my-4 md:my-6">
@@ -193,7 +240,10 @@ export default function BilloChatSignup() {
 
           {/* Social signup buttons */}
           <div className="grid grid-cols-2 gap-3 mb-4 md:mb-6">
-            <button className="flex items-center justify-center py-2 md:py-3 px-4 bg-white/90 rounded-lg hover:bg-white transition-colors">
+            <button
+              onClick={handleGoogleLogin}
+              className="flex items-center justify-center py-2 md:py-3 px-4 bg-white/90 rounded-lg hover:bg-white transition-colors"
+            >
               <svg className="w-4 h-4 md:w-5 md:h-5" viewBox="0 0 24 24">
                 <path
                   fill="#4285F4"
@@ -213,7 +263,10 @@ export default function BilloChatSignup() {
                 />
               </svg>
             </button>
-            <button className="flex items-center justify-center py-2 md:py-3 px-4 bg-white/90 rounded-lg hover:bg-white transition-colors">
+            <button
+              onClick={handleFacebookLogin}
+              className="flex items-center justify-center py-2 md:py-3 px-4 bg-white/90 rounded-lg hover:bg-white transition-colors"
+            >
               <svg
                 className="w-4 h-4 md:w-5 md:h-5 text-blue-600"
                 fill="currentColor"
@@ -229,12 +282,12 @@ export default function BilloChatSignup() {
             <span className="text-white/60 text-xs md:text-sm">
               Already have an account?{" "}
             </span>
-            <a
-              href="#"
+            <Link
+              to="/"
               className="text-white text-xs md:text-sm hover:underline"
             >
               Log In
-            </a>
+            </Link>
           </div>
         </div>
       </div>
