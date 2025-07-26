@@ -1,28 +1,3 @@
-// import { BrowserRouter } from "react-router-dom";
-// // import Login from "./components/Login";
-// // import Signup from "./components/Signup";
-// import { Routes, Route } from "react-router-dom";
-// import { ChatProvider } from "./components/ChatContext";
-// import ChatInterface from "./components/ChatInterface";
-// import { AuthProvider } from "./components/AuthProvider";
-
-// function App() {
-//   return (
-//     <BrowserRouter>
-//       <AuthProvider>
-//         <ChatProvider>
-//           <Routes>
-//             <Route path="/" element={<ChatInterface />} />
-//           </Routes>
-//         </ChatProvider>
-//       </AuthProvider>
-//     </BrowserRouter>
-//   );
-// }
-
-// export default App;
-
-// src/App.js
 import { BrowserRouter } from "react-router-dom";
 
 import Login from "./recomponents/Auth/Login";
@@ -46,7 +21,6 @@ function App() {
               element={
                 <ProtectedRoute>
                   <ErrorBoundary>
-                    {/* Wrapping ChatInterface in ErrorBoundary to catch errors */}
                     <ChatInterface />
                   </ErrorBoundary>
                 </ProtectedRoute>

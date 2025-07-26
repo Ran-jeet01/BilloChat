@@ -467,21 +467,7 @@ export const ChatProvider = ({ children }) => {
     }
   };
 
-  // Handle location tracking
-  // const toggleTracking = () => {
-  //   if (isTracking) {
-  //     stopTracking();
-  //   } else {
-  //     startTracking();
-  //     if (activeChat) {
-  //       if (chatType === "group") {
-  //         shareLocationWithGroup(activeChat.id);
-  //       } else if (chatType === "private") {
-  //         shareLocationPrivate(activeChat.id);
-  //       }
-  //     }
-  //   }
-  // };
+ 
 
   const startTracking = () => {
     if (navigator.geolocation) {
